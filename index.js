@@ -19,7 +19,8 @@ async function run(){
 
     try{
         const productCollection=client.db('fashion_gallery').collection('products');
-        const orderCollection= client.db('fashion_gallery').collection('orders')
+        const orderCollection= client.db('fashion_gallery').collection('orders');
+        const usersCollection= client.db('fashion_gallery').collection('users');
         
 
 
@@ -53,16 +54,24 @@ async function run(){
             const result= await orderCollection.insertOne(order)
             res.send(result);
         });
+        //specific user order
         app.get('/orders',async (req, res) => {
             const email = req.query.email;
             const query={email:email};
             const orders= await orderCollection.find(query).toArray();
             res.send(orders);
+            });
+
+            // creat users api
+            app.post('/users', async(req,res)=>{
+                const user=req.body;
+                const result= await usersCollection.insertOne(user);
+                res.send(result);
+            })
+
             
 
 
-
-        });
 
     }
     finally{
