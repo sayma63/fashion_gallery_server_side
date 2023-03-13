@@ -144,6 +144,15 @@ async function run(){
                 }
                 const result= await usersCollection.updateOne(filter,updatedDoc,options);
                 res.send(result)
+            });
+            //delete product
+            app.delete('/doctors/:id', async(req,res)=>{
+                const id=req.params.id;
+                const filter = {_id: new ObjectId(id)};
+                const result=await productCollection.deleteOne(filter);
+                return res.send(result)
+
+
             })
 
             
