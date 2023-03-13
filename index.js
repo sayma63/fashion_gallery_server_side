@@ -70,6 +70,11 @@ async function run(){
             const result = await productCollection.insertOne(newProduct);
             res.send(result)
         });
+        app.get('/products', async (req, res) => {
+            const query = {};
+           const result = await productCollection.find(query).toArray();
+            res.send(result);
+        });
 
         //orders api
         app.post('/orders', async (req,res)=>{
