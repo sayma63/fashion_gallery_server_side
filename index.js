@@ -63,6 +63,13 @@ async function run(){
             const product = await productCollection.findOne(query);
             res.send(product);
         });
+               //add product
+        app.post('/products', async (req, res) => {
+            const newProduct = req.body;
+
+            const result = await productCollection.insertOne(newProduct);
+            res.send(result)
+        });
 
         //orders api
         app.post('/orders', async (req,res)=>{
@@ -87,7 +94,7 @@ async function run(){
                 const query={email:email};
                 const user= await usersCollection.findOne(query);
                 if(user){
-                    const token=jwt.sign({email},process.env.ACCESS_TOKEN,{expiresIn:'1h'})
+                    const token=jwt.sign({email},process.env.ACCESS_TOKEN,{expiresIn:60 * 60})
                     return res.send({accessToken: token})
                 }
                 
@@ -95,9 +102,9 @@ async function run(){
 
             });
             // is particular user admin
-            app.get("/users/admin/:id", async(req,res)=>{
-                const id = req.params.id;
-                const query={_id: new ObjectId(id)};
+            app.get("/users/admin/:email", async(req,res)=>{
+                const email = req.params.email;
+                const query={email: email};
                 const user = await usersCollection.findOne(query);
                 res.send({isAdmin: user?.role === 'admin'});
             })
