@@ -45,8 +45,7 @@ async function run(){
 
 
 
-
-
+        
 
            //All products api
         app.get('/products', async(req,res)=>{
@@ -55,6 +54,18 @@ async function run(){
             const products= await cursor.toArray();
             res.send(products);
            });
+           //verify admin
+           const verifyAdmin=async(req,res,next)=>{
+            
+            const decodedEmail= req.decoded.email;
+            const query= {email: decodedEmail}
+            const user= await usersCollection.findOne(query);
+            if(user?.role!=='admin'){
+                return res.status(403).send({message:'forbidden access'})
+            }
+            next();  
+        }
+
          //single product details api
          app.get('/products/:id', async(req,res) => {
             const id = req.params.id;
@@ -64,17 +75,27 @@ async function run(){
             res.send(product);
         });
                //add product
-        app.post('/products', async (req, res) => {
+        app.post('/products', verifyJWT,verifyAdmin, async (req, res) => {
             const newProduct = req.body;
 
             const result = await productCollection.insertOne(newProduct);
             res.send(result)
         });
-        app.get('/products', async (req, res) => {
+        //all product
+        app.get('/products', verifyJWT,verifyAdmin, async (req, res) => {
             const query = {};
            const result = await productCollection.find(query).toArray();
             res.send(result);
         });
+         //delete product
+         app.delete('/products/:id',verifyJWT,verifyAdmin, async(req,res)=>{
+            const id=req.params.id;
+            const filter = {_id: new ObjectId(id)};
+            const result=await productCollection.deleteOne(filter);
+            return res.send(result)
+
+
+        })
 
         //orders api
         app.post('/orders', async (req,res)=>{
@@ -127,13 +148,8 @@ async function run(){
                 res.send(users);
             });
             //make admin api
-            app.put('/users/admin/:id', verifyJWT, async(req,res)=>{
-                const decodedEmail= req.decoded.email;
-                const query= {email: decodedEmail}
-                const user= await usersCollection.findOne(query);
-                if(user?.role!=='admin'){
-                    return res.status(403).send({message:'forbidden access'})
-                }
+            app.put('/users/admin/:id', verifyJWT,verifyAdmin, async(req,res)=>{
+                
                 const id = req.params.id;
                 const filter=  {_id: new ObjectId(id)};
                 const options= {upsert : true};
@@ -145,15 +161,7 @@ async function run(){
                 const result= await usersCollection.updateOne(filter,updatedDoc,options);
                 res.send(result)
             });
-            //delete product
-            app.delete('/doctors/:id', async(req,res)=>{
-                const id=req.params.id;
-                const filter = {_id: new ObjectId(id)};
-                const result=await productCollection.deleteOne(filter);
-                return res.send(result)
-
-
-            })
+           
 
             
 
