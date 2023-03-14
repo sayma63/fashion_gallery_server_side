@@ -103,6 +103,14 @@ async function run(){
             const result= await orderCollection.insertOne(order)
             res.send(result);
         });
+        app.get('/orders/:id', async(req,res)=>{
+            const id= req.params.id;
+            const query = {_id: new ObjectId(id)};
+            const order= await orderCollection.findOne(query);
+            res.send(booking);
+
+
+        })
         //specific user order
         app.get('/orders', verifyJWT,async (req, res) => {
             const email = req.query.email;
