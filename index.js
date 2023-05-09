@@ -137,6 +137,14 @@ async function run(){
                 res.status(403).send({accessToken:""});
 
             });
+            //get all order
+            app.get('/order', async (req, res) => {
+                const query = {};
+                const cursor = orderCollection.find(query);
+                const result = await cursor.toArray();
+                res.send(result);
+    
+            });
             // is particular user admin
             app.get("/users/admin/:email", async(req,res)=>{
                 const email = req.params.email;
