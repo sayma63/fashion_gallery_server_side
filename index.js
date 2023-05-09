@@ -38,6 +38,7 @@ async function run(){
         const productCollection=client.db('fashion_gallery').collection('products');
         const orderCollection= client.db('fashion_gallery').collection('orders');
         const usersCollection= client.db('fashion_gallery').collection('users');
+        const reviewCollection= client.db('fashion_gallery').collection('reviews');
         const paymentsCollection= client.db('fashion_gallery').collection('payments');
         
 
@@ -143,6 +144,24 @@ async function run(){
                 const cursor = orderCollection.find(query);
                 const result = await cursor.toArray();
                 res.send(result);
+    
+            });
+            //review post
+            app.post('/reviews', async (req, res) => {
+                const review = req.body;
+                const result = await reviewCollection.insertOne(review);
+                res.send(result);
+
+    
+            });
+            //show all reviews
+            app.get('/reviews', async (req, res) => {
+                const query = {};
+                const cursor = reviewCollection.find(query);
+                const result = await cursor.toArray();
+                res.send(result)
+    
+    
     
             });
             // is particular user admin
